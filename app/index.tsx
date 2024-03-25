@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Svg, SvgFromUri } from "react-native-svg";
 import axios from "axios";
 import {
   View,
@@ -13,11 +14,13 @@ export default function index() {
   const [modalInput, setModalInput] = useState(false);
   const [cidade, setCidade] = useState("Recife");
   const [weather, setWeather] = useState([]);
+  const [weatherIcon, setWeatherIcon] = useState("");
+  const [subIcons, setSubIcons] = useState([]);
 
   const getWeatherApi = async () => {
     const response = await axios.get("https://api.hgbrasil.com/weather?format=json-cors&key=9dfd2152&city_name=" + cidade)
     setWeather(response.data)
-    console.log(response.data)
+    setWeatherIcon("https://assets.hgbrasil.com/weather/icons/conditions/" + response.data.results.condition_slug + ".svg")
   }
 
   useEffect(()=>{
@@ -63,10 +66,7 @@ export default function index() {
           </View>
         )}
         <View className="flex justify-center items-center mt-6">
-          <Image
-            className="flex w-60 h-60"
-            source={require("../public/images/rainSunImage.png")}
-          ></Image>
+          <SvgFromUri className="" uri={weatherIcon}></SvgFromUri>
           <View className="flex items-center mb-6">
             <Text className="text-6xl">{weather?.results?.temp}&deg;C</Text>
             <Text>{weather?.results?.description}</Text>
@@ -108,10 +108,10 @@ export default function index() {
             <Image source={require("../public/icons/calendarIcon.png")}></Image>
           </View>
           <View className="flex gap-3 mt-3">
-            {weather?.results?.forecast.map((item) => (
-              <View className="flex flex-row justify-between items-center">
+            {weather?.results?.forecast.map((item, index) => (
+              <View className="flex flex-row justify-between items-center" key={index}>
                 <Text>{item.weekday} {item.date}</Text>
-                <Image source={require("../public/icons/sunIcon.png")}></Image>
+                <SvgFromUri uri={"https://assets.hgbrasil.com/weather/icons/conditions/"+ item.condition + ".svg"}></SvgFromUri>
                 <View className="flex flex-row gap-2">
                   <Text>Min: {item.min}&deg;C</Text>
                   <Text>Máx: {item.max}&deg;C</Text>
